@@ -7,7 +7,7 @@
 
 ## 安装
 ```shell
-composer require hiworld/ctwing
+composer require hiworld/laravel-ctwing
 ```
 
 # 配置
