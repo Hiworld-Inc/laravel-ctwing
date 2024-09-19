@@ -28,6 +28,11 @@ class CTWingServiceProvider extends ServiceProvider
         $this->app->singleton('commandModbus', function () {
             return new CommandModbus();
         });
+
+        // 注册 DeviceEvent 服务
+        $this->app->singleton('deviceEvent', function () {
+            return new DeviceEvent();
+        });
     }
 
     public function boot()

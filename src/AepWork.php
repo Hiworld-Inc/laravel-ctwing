@@ -25,4 +25,9 @@ class AepWork extends Facade
     {
         return app('commandModbus');
     }
+
+    public static function DeviceEvent()
+    {
+        return app('deviceEvent');
+    }
 }
