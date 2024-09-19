@@ -30,4 +30,9 @@ class AepWork extends Facade
     {
         return app('deviceEvent');
     }
+
+    public static function ProductManagement()
+    {
+        return app('productManagement');
+    }
 }

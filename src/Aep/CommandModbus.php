@@ -2,19 +2,15 @@
 
 namespace Hiworld\CTWing\Aep;
 
-use Hiworld\CTWing\Core\AepSdkCore;
+use Hiworld\CTWing\Services\AepSdkService;
 
 class CommandModbus
 {
-    protected $appKey;
-    protected $appSecret;
     protected $masterKey;
 
-    public function __construct($appKey = null, $appSecret = null, $masterKey = null)
+    public function __construct($masterKey = null)
     {
         // 从配置文件中获取默认值，若未传入参数则使用配置文件中的值
-        $this->appKey = $appKey ?? config('ctwing.app_key');
-        $this->appSecret = $appSecret ?? config('ctwing.app_secret');
         $this->masterKey = $masterKey ?? config('ctwing.master_key');
     }
 
@@ -45,7 +41,7 @@ class CommandModbus
 
         $version = "20200904171008";
 
-        return AepSdkCore::sendSDkRequest($path, $headers, $param, null, $version, $this->appKey, $this->appSecret, "GET");
+        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -69,7 +65,7 @@ class CommandModbus
 
         $version = "20200904172207";
 
-        return AepSdkCore::sendSDkRequest($path, $headers, $param, null, $version, $this->appKey, $this->appSecret, "GET");
+        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -83,7 +79,7 @@ class CommandModbus
 
         $version = "20200404012453";
 
-        return AepSdkCore::sendSDkRequest($path, $headers, null, $body, $version, $this->appKey, $this->appSecret, "PUT");
+        return AepSdkService::sendSdkRequest($path, $headers, null, $body, $version, "PUT");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -97,6 +93,6 @@ class CommandModbus
 
         $version = "20200404012449";
 
-        return AepSdkCore::sendSDkRequest($path, $headers, null, $body, $version, $this->appKey, $this->appSecret, "POST");
+        return AepSdkService::sendSdkRequest($path, $headers, null, $body, $version, "POST");
     }
 }

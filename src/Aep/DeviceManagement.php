@@ -1,19 +1,15 @@
 <?php
 namespace Hiworld\CTWing\Aep;
 
-use Hiworld\CTWing\Core\AepSdkCore;
+use Hiworld\CTWing\Services\AepSdkService;
 
 class DeviceManagement
 {
-    protected $appKey;
-    protected $appSecret;
     protected $masterKey;
 
-    public function __construct($appKey = null, $appSecret = null, $masterKey = null)
+    public function __construct($masterKey = null)
     {
         // 从配置文件中获取默认值，若未传入参数则使用配置值
-        $this->appKey = $appKey ?? config('ctwing.app_key');
-        $this->appSecret = $appSecret ?? config('ctwing.app_secret');
         $this->masterKey = $masterKey ?? config('ctwing.master_key');
     }
 
@@ -39,7 +35,11 @@ class DeviceManagement
 
         $version = "20190507012134";
 
-        return AepSdkCore::sendSDkRequest($path, $headers, $param, null, $version, $this->appKey, $this->appSecret, "GET");
+        // 实例化 AepSdkService
+        $aepSdkService = new AepSdkService();
+
+        // 传递 'GET' 作为 HTTP 方法
+        return $aepSdkService->sendSdkRequest($path, $headers, $param, null, $version, 'GET');
     }
 
     // 参数deviceId: 类型String, 参数不可以为空
@@ -58,7 +58,7 @@ class DeviceManagement
 
         $version = "20181031202139";
 
-        return AepSdkCore::sendSDkRequest($path, $headers, $param, null, $version, $this->appKey, $this->appSecret, "GET");
+        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
     }
 
     // 参数productId: 类型long, 参数不可以为空
@@ -77,7 +77,7 @@ class DeviceManagement
 
         $version = "20181031202131";
 
-        return AepSdkCore::sendSDkRequest($path, $headers, $param, null, $version, $this->appKey, $this->appSecret, "DELETE");
+        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "DELETE");
     }
 
     public function UpdateDevice($deviceId, $body)
@@ -92,7 +92,7 @@ class DeviceManagement
 
         $version ="20181031202122";
 
-        return  AepSdkCore::sendSDkRequest($path, $headers, $param, $body, $version, $this->appKey, $this->appSecret, "PUT");
+        return  AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "PUT");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -104,11 +104,111 @@ class DeviceManagement
         $path="/aep_device_management/device";
         $headers = ["MasterKey" => $this->masterKey];
 
-        $param = [
-            "body" => $body
-        ];
+        $param = null;
+
         $version ="20181031202117";
 
-        return AepSdkCore::sendSDkRequest($path, $headers, $param, $body, $version, $this->appKey, $this->appSecret, "POST");
+        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version,  "POST");
+    }
+
+    //参数MasterKey: 类型String, 参数不可以为空
+    //  描述:
+    //参数body: 类型json, 参数不可以为空
+    //  描述:body,具体参考平台api说明
+    public function BindDevice($body)
+    {
+        $path="/aep_device_management/bindDevice";
+        $headers = ["MasterKey" => $this->masterKey];
+        $param=null;
+        $version ="20191024140057";
+
+        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+    }
+
+    //参数MasterKey: 类型String, 参数不可以为空
+    //  描述:
+    //参数body: 类型json, 参数不可以为空
+    //  描述:body,具体参考平台api说明
+    public function UnbindDevice($body)
+    {
+        $path="/aep_device_management/unbindDevice";
+        $headers = ["MasterKey" => $this->masterKey];
+
+        $param=null;
+        $version ="20191024140103";
+
+        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+    }
+
+    //参数imei: 类型String, 参数不可以为空
+    //  描述:
+    public function QueryProductInfoByImei($imei)
+    {
+        $path="/aep_device_management/device/getProductInfoFormApiByImei";
+        $headers=null;
+        $param=array();
+        $param["imei"]=$imei;
+
+        $version ="20191213161859";
+
+        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+    }
+
+    //参数MasterKey: 类型String, 参数不可以为空
+    //  描述:
+    //参数body: 类型json, 参数不可以为空
+    //  描述:body,具体参考平台api说明
+    public function ListDeviceInfo($body)
+    {
+        $path="/aep_device_management/listByDeviceIds";
+        $headers = ["MasterKey" => $this->masterKey];
+
+        $param=null;
+        $version ="20210828062945";
+
+        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+    }
+
+    //参数MasterKey: 类型String, 参数不可以为空
+    //  描述:
+    //参数body: 类型json, 参数不可以为空
+    //  描述:body,具体参考平台api说明
+    public function DeleteDeviceByPost($body)
+    {
+        $path="/aep_device_management/deleteDevice";
+        $headers = ["MasterKey" => $this->masterKey];
+
+        $param=null;
+        $version ="20211009132842";
+
+        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+    }
+
+    //参数MasterKey: 类型String, 参数不可以为空
+    //  描述:
+    //参数body: 类型json, 参数不可以为空
+    //  描述:body,具体参考平台api说明
+    public function ListDeviceActiveStatus($body)
+    {
+        $path="/aep_device_management/listActiveStatus";
+        $headers = ["MasterKey" => $this->masterKey];
+        $param=null;
+        $version ="20211010063104";
+
+        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+    }
+
+    //参数MasterKey: 类型String, 参数不可以为空
+    //  描述:
+    //参数body: 类型json, 参数不可以为空
+    //  描述:body,具体参考平台api说明
+    public function BatchCreateDevice($body)
+    {
+        $path="/aep_device_management/batchDevice";
+        $headers = ["MasterKey" => $this->masterKey];
+        $param=null;
+        $version ="20230330043852";
+
+        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
     }
 }

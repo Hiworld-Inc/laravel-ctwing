@@ -2,18 +2,15 @@
 
 namespace Hiworld\CTWing\Aep;
 
-use Hiworld\CTWing\Core\AepSdkCore;
+use Hiworld\CTWing\Services\AepSdkService;
+
 class DeviceCommand
 {
-    protected $appKey;
-    protected $appSecret;
     protected $masterKey;
 
-    public function __construct($appKey = null, $appSecret = null, $masterKey = null)
+    public function __construct($masterKey = null)
     {
         // 从配置文件中获取默认值，若未传入参数则使用配置值
-        $this->appKey = $appKey ?? config('ctwing.app_key');
-        $this->appSecret = $appSecret ?? config('ctwing.app_secret');
         $this->masterKey = $masterKey ?? config('ctwing.master_key');
     }
 
@@ -28,20 +25,7 @@ class DeviceCommand
 
         $version = "20190712225145";
 
-        if (is_array($body)) {
-            $body = json_encode($body);
-        }
-
-        return AepSdkCore::sendSDkRequest(
-            $path,
-            $headers,
-            null,
-            $body,
-            $version,
-            $this->appKey,
-            $this->appSecret,
-            "POST"
-        );
+        return AepSdkService::sendSdkRequest($path, $headers, null, $body, $version, 'POST');
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -65,16 +49,7 @@ class DeviceCommand
 
         $version = "20190712225241";
 
-        return AepSdkCore::sendSDkRequest(
-            $path,
-            $headers,
-            $param,
-            null,
-            $version,
-            $this->appKey,
-            $this->appSecret,
-            "GET"
-        );
+        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -88,15 +63,10 @@ class DeviceCommand
 
         $version = "20190615023142";
 
-        return AepSdkCore::sendSDkRequest(
-            $path,
-            $headers,
-            null,
-            $body,
-            $version,
-            $this->appKey,
-            $this->appSecret,
-            "PUT"
-        );
+        if (is_array($body)) {
+            $body = json_encode($body);
+        }
+
+        return AepSdkService::sendSdkRequest($path, $headers, null, $body, $version, "PUT");
     }
 }
