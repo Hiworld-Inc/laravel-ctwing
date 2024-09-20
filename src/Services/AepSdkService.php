@@ -43,7 +43,7 @@ class AepSdkService
     public static function sendSdkRequest($path, $head, $param, $body, $version, $method = 'GET')
     {
         // 调试输出
-        Log::info('HTTP Method: ' . $method);
+        // Log::info('HTTP Method: ' . $method);
 
         // 确保静态属性已经初始化
         if (!isset(self::$baseUrl) || !isset(self::$timeUrl)) {
@@ -79,7 +79,8 @@ class AepSdkService
             'timestamp'   => (string) $timestamp,
             'version'     => $version,
             'signature'   => self::sign(array_merge($param ?? [], $head ?? []), $timestamp, $body),
-            'MasterKey'   => $head['MasterKey'] ?? ''
+            'MasterKey'   => $head['MasterKey'] ?? '',
+            'Content-Type' => 'application/json'
         ];
 
         if ($head != null) {
@@ -117,11 +118,11 @@ class AepSdkService
         }
 
         if ($response->failed()) {
-            Log::error('HTTP Request Failed: ' . $response->body());
+            // Log::error('HTTP Request Failed: ' . $response->body());
             throw new Exception('HTTP Request Failed: ' . $response->body());
         }
 
-        return $response->body();
+        return json_decode($response->body(), true);
     }
 
 
@@ -146,7 +147,7 @@ class AepSdkService
                 throw new Exception("Error: cannot get timestamp.");
             }
         } catch (Exception $e) {
-            Log::error($e->getMessage());
+            // Log::error($e->getMessage());
         }
 
         return $offsetTime;

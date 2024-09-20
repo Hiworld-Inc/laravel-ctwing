@@ -18,6 +18,8 @@ php artisan vendor:publish --provider="Hiworld\\CTWing\\CTWingServiceProvider"
 
 ` .env ` 文件
 ```bash
+CTWING_BASE_URL=
+CTWING_TIME_URL=
 CTWING_APP_KEY=
 CTWING_APP_SECRET=
 CTWING_MASTER_KEY=
