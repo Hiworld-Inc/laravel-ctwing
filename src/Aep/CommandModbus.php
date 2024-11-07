@@ -6,28 +6,21 @@ use Hiworld\CTWing\Services\AepSdkService;
 
 class CommandModbus
 {
-    protected $masterKey;
-
-    public function __construct($masterKey = null)
-    {
-        // 从配置文件中获取默认值，若未传入参数则使用配置文件中的值
-        $this->masterKey = $masterKey ?? config('ctwing.master_key');
-    }
-
-    //参数status: 类型String, 参数可以为空
-    //  描述:状态可选填： 1：指令已保存 2：指令已发送 3：指令已送达 4：指令已完成 6：指令已取消 999：指令失败
-    //参数startTime: 类型String, 参数可以为空
-    //  描述:
-    //参数endTime: 类型String, 参数可以为空
-    //  描述:
-    //参数pageNow: 类型String, 参数可以为空
-    //  描述:
-    //参数pageSize: 类型String, 参数可以为空
-    //  描述:
-    public function QueryCommandList($productId, $deviceId, $status = "", $startTime = "", $endTime = "", $pageNow = "", $pageSize = "")
+    /**
+     * Query the list of commands for a Modbus device.
+     *
+     * @param string $productId Product ID
+     * @param string $deviceId Device ID
+     * @param string $status Status of the command (optional)
+     * @param string $startTime Start time for the query (optional)
+     * @param string $endTime End time for the query (optional)
+     * @param string $pageNow Current page number (optional)
+     * @param string $pageSize Number of items per page (optional)
+     * @return array|string|bool Response from the API
+     */
+    public function queryCommandList($productId, $deviceId, $status = "", $startTime = "", $endTime = "", $pageNow = "", $pageSize = "")
     {
         $path = "/aep_command_modbus/modbus/commands";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param = [
             "productId" => $productId,
@@ -41,21 +34,20 @@ class CommandModbus
 
         $version = "20200904171008";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "GET");
     }
 
-    //参数MasterKey: 类型String, 参数不可以为空
-    //  描述:MasterKey在该设备所属产品的概况中可以查看
-    //参数productId: 类型long, 参数不可以为空
-    //  描述:产品ID
-    //参数deviceId: 类型String, 参数不可以为空
-    //  描述:设备ID
-    //参数commandId: 类型String, 参数不可以为空
-    //  描述:指令ID
-    public function QueryCommand($productId, $deviceId, $commandId)
+    /**
+     * Query a specific command for a Modbus device.
+     *
+     * @param string $productId Product ID
+     * @param string $deviceId Device ID
+     * @param string $commandId Command ID
+     * @return array|string|bool Response from the API
+     */
+    public function queryCommand($productId, $deviceId, $commandId)
     {
         $path = "/aep_command_modbus/modbus/command";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param = [
             "productId" => $productId,
@@ -65,34 +57,36 @@ class CommandModbus
 
         $version = "20200904172207";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "GET");
     }
 
-    //参数MasterKey: 类型String, 参数不可以为空
-    //  描述:MasterKey在该设备所属产品的概况中可以查看
-    //参数body: 类型json, 参数不可以为空
-    //  描述:body,具体参考平台api说明
-    public function CancelCommand($body)
+    /**
+     * Cancel a command for a Modbus device.
+     *
+     * @param string $body JSON body containing the command details
+     * @return array|string|bool Response from the API
+     */
+    public function cancelCommand($body)
     {
         $path = "/aep_command_modbus/modbus/cancelCommand";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $version = "20200404012453";
 
-        return AepSdkService::sendSdkRequest($path, $headers, null, $body, $version, "PUT");
+        return AepSdkService::sendSdkRequest($path, null, $body, $version, "PUT");
     }
 
-    //参数MasterKey: 类型String, 参数不可以为空
-    //  描述:MasterKey在该设备所属产品的概况中可以查看
-    //参数body: 类型json, 参数不可以为空
-    //  描述:body,具体参考平台api说明
-    public function CreateCommand($body)
+    /**
+     * Create a new command for a Modbus device.
+     *
+     * @param string $body JSON body containing the command details
+     * @return array|string|bool Response from the API
+     */
+    public function createCommand($body)
     {
         $path = "/aep_command_modbus/modbus/command";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $version = "20200404012449";
 
-        return AepSdkService::sendSdkRequest($path, $headers, null, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, null, $body, $version, "POST");
     }
 }

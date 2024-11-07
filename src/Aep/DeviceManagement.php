@@ -5,14 +5,6 @@ use Hiworld\CTWing\Services\AepSdkService;
 
 class DeviceManagement
 {
-    protected $masterKey;
-
-    public function __construct($masterKey = null)
-    {
-        // 从配置文件中获取默认值，若未传入参数则使用配置值
-        $this->masterKey = $masterKey ?? config('ctwing.master_key');
-    }
-
     // 参数productId: 类型long, 参数不可以为空
     // 描述:
     // 参数searchValue: 类型String, 参数可以为空
@@ -39,7 +31,7 @@ class DeviceManagement
         $aepSdkService = new AepSdkService();
 
         // 传递 'GET' 作为 HTTP 方法
-        return $aepSdkService->sendSdkRequest($path, $headers, $param, null, $version, 'GET');
+        return $aepSdkService->sendSdkRequest($path, $param, null, $version, 'GET');
     }
 
     // 参数deviceId: 类型String, 参数不可以为空
@@ -49,7 +41,6 @@ class DeviceManagement
     public function QueryDevice($deviceId, $productId)
     {
         $path = "/aep_device_management/device";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param = [
             "deviceId" => $deviceId,
@@ -58,7 +49,7 @@ class DeviceManagement
 
         $version = "20181031202139";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "GET");
     }
 
     // 参数productId: 类型long, 参数不可以为空
@@ -68,7 +59,6 @@ class DeviceManagement
     public function DeleteDevice($productId, $deviceIds)
     {
         $path = "/aep_device_management/device";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param = [
             "productId" => $productId,
@@ -77,13 +67,12 @@ class DeviceManagement
 
         $version = "20181031202131";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "DELETE");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "DELETE");
     }
 
     public function UpdateDevice($deviceId, $body)
     {
         $path="/aep_device_management/device";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param = [
             "deviceId" => $deviceId,
@@ -92,7 +81,7 @@ class DeviceManagement
 
         $version ="20181031202122";
 
-        return  AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "PUT");
+        return  AepSdkService::sendSdkRequest($path, $param, $body, $version, "PUT");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -102,13 +91,12 @@ class DeviceManagement
     public function CreateDevice($body)
     {
         $path="/aep_device_management/device";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param = null;
 
         $version ="20181031202117";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version,  "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version,  "POST");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -118,11 +106,10 @@ class DeviceManagement
     public function BindDevice($body)
     {
         $path="/aep_device_management/bindDevice";
-        $headers = ["MasterKey" => $this->masterKey];
         $param=null;
         $version ="20191024140057";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -132,12 +119,11 @@ class DeviceManagement
     public function UnbindDevice($body)
     {
         $path="/aep_device_management/unbindDevice";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param=null;
         $version ="20191024140103";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 
     //参数imei: 类型String, 参数不可以为空
@@ -151,7 +137,7 @@ class DeviceManagement
 
         $version ="20191213161859";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "GET");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -161,12 +147,11 @@ class DeviceManagement
     public function ListDeviceInfo($body)
     {
         $path="/aep_device_management/listByDeviceIds";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param=null;
         $version ="20210828062945";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -176,12 +161,11 @@ class DeviceManagement
     public function DeleteDeviceByPost($body)
     {
         $path="/aep_device_management/deleteDevice";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param=null;
         $version ="20211009132842";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -191,11 +175,10 @@ class DeviceManagement
     public function ListDeviceActiveStatus($body)
     {
         $path="/aep_device_management/listActiveStatus";
-        $headers = ["MasterKey" => $this->masterKey];
         $param=null;
         $version ="20211010063104";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -205,10 +188,9 @@ class DeviceManagement
     public function BatchCreateDevice($body)
     {
         $path="/aep_device_management/batchDevice";
-        $headers = ["MasterKey" => $this->masterKey];
         $param=null;
         $version ="20230330043852";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 }

@@ -6,13 +6,6 @@ use Hiworld\CTWing\Services\AepSdkService;
 
 class SubscribeNorth
 {
-    protected $masterKey;
-
-    public function __construct($masterKey = null)
-    {
-        // 从配置文件中获取默认值，若未传入参数则使用配置值
-        $this->masterKey = $masterKey ?? config('ctwing.master_key');
-    }
     //参数subId: 类型long, 参数不可以为空
     //  描述:订阅记录id
     //参数productId: 类型long, 参数不可以为空
@@ -22,7 +15,6 @@ class SubscribeNorth
     public function GetSubscription($subId, $productId)
     {
         $path="/aep_subscribe_north/subscription";
-        $headers = ['MasterKey' => $this->masterKey];
 
         $param = [
             'subId' => $subId,
@@ -31,7 +23,7 @@ class SubscribeNorth
 
         $version ="20220624171733";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "GET");
     }
 
     //参数productId: 类型long, 参数不可以为空
@@ -51,7 +43,6 @@ class SubscribeNorth
     public function GetSubscriptionsList($productId, $pageNow, $pageSize,  $subType = "", $searchValue = "", $deviceGroupId = "")
     {
         $path="/aep_subscribe_north/subscribes";
-        $headers= ['MasterKey' => $this->masterKey];
 
         $param = [
             'productId' => $productId,
@@ -64,7 +55,7 @@ class SubscribeNorth
 
         $version ="20220624163719";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "GET");
     }
 
     //参数subId: 类型String, 参数不可以为空
@@ -80,7 +71,6 @@ class SubscribeNorth
     public  function DeleteSubscription($subId, $productId, $subLevel, $MasterKey, $deviceId = "")
     {
         $path="/aep_subscribe_north/subscription";
-        $headers= ['MasterKey' => $this->masterKey];
 
         $param = [
             'subId' => $subId,
@@ -91,7 +81,7 @@ class SubscribeNorth
 
         $version ="20181031202023";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "DELETE");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "DELETE");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -101,12 +91,11 @@ class SubscribeNorth
     public function CreateSubscription($body)
     {
         $path="/aep_subscribe_north/subscription";
-        $headers= ['MasterKey' => $this->masterKey];
 
         $param=null;
         $version ="20181031202018";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 
     //参数MasterKey: 类型String, 参数可以为空
@@ -116,11 +105,10 @@ class SubscribeNorth
     public function CreateDestHttpUrl($body)
     {
         $path="/aep_subscribe_north/createUrl";
-        $headers= ['MasterKey' => $this->masterKey];
 
         $param=null;
         $version ="20231109105327";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 }

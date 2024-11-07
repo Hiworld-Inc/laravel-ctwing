@@ -5,16 +5,6 @@ use Hiworld\CTWing\Services\AepSdkService;
 
 class DeviceEvent
 {
-    protected $masterKey;
-
-    public function __construct($masterKey = null)
-    {
-        // 从配置文件中获取默认值，若未传入参数则使用配置值
-        $this->masterKey = $masterKey ?? config('ctwing.master_key');
-    }
-
-    //参数MasterKey: 类型String, 参数不可以为空
-    //  描述:
     //参数body: 类型json, 参数不可以为空
     //  {
     // "productId":"10000088",//必填
@@ -30,12 +20,11 @@ class DeviceEvent
     public function QueryDeviceEventList($body)
     {
         $path="/aep_device_event/device/events";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param = null;
         $version ="20210327064751";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 
     //参数MasterKey: 类型String, 参数不可以为空
@@ -58,6 +47,6 @@ class DeviceEvent
         $param=null;
         $version ="20210327064755";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "POST");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "POST");
     }
 }

@@ -6,14 +6,6 @@ use Hiworld\CTWing\Services\AepSdkService;
 
 class DeviceModel
 {
-    protected $masterKey;
-
-    public function __construct($masterKey = null)
-    {
-        // 从配置文件中获取默认值，若未传入参数则使用配置值
-        $this->masterKey = $masterKey ?? config('ctwing.master_key');
-    }
-
     // 参数MasterKey: 类型String, 参数不可以为空
     //  描述:MasterKey在该设备所属产品的概况中可以查看
     // 参数productId: 类型long, 参数不可以为空
@@ -27,7 +19,6 @@ class DeviceModel
     public function queryPropertyList($productId, $searchValue = "", $pageNow = "", $pageSize = "")
     {
         $path = "/aep_device_model/dm/app/model/properties";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param = [
             "productId" => $productId,
@@ -38,7 +29,7 @@ class DeviceModel
 
         $version = "20190712223330";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "GET");
     }
 
     // 参数MasterKey: 类型String, 参数不可以为空
@@ -56,7 +47,6 @@ class DeviceModel
     public function queryServiceList($productId, $searchValue = "", $serviceType = "", $pageNow = "", $pageSize = "")
     {
         $path = "/aep_device_model/dm/app/model/services";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param = [
             "productId" => $productId,
@@ -68,6 +58,6 @@ class DeviceModel
 
         $version = "20190712224233";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "GET");
     }
 }

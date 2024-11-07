@@ -8,47 +8,69 @@ use Exception;
 
 class AepSdkService
 {
-    // 声明静态属性
     protected $baseUrl;
     protected $timeUrl;
     protected $appKey;
     protected $appSecret;
-    protected static $offset = 0;
-    protected static $lastGetOffsetTime = 0;
+    protected $masterKey;
+    protected $offset = 0;
+    protected $lastGetOffsetTime = 0;
 
-    public function __construct()
+    /**
+     * Constructor to initialize the service with necessary parameters.
+     *
+     * @param string $baseUrl Base URL for the API
+     * @param string $timeUrl URL for time synchronization
+     * @param string $appKey Application Key
+     * @param string $appSecret Application Secret
+     * @param string $masterKey Master Key
+     */
+    public function __construct($baseUrl, $timeUrl, $appKey, $appSecret, $masterKey)
     {
-        $config = config('ctwing');
-        $this->baseUrl = $config['base_url'];
-        $this->timeUrl = $config['time_url'];
-        $this->appKey = $config['app_key'];
-        $this->appSecret = $config['app_secret'];
+        $this->baseUrl = $baseUrl;
+        $this->timeUrl = $timeUrl;
+        $this->appKey = $appKey;
+        $this->appSecret = $appSecret;
+        $this->masterKey = $masterKey;
     }
 
     /**
-     * 发送 SDK 请求
+     * Send an SDK request to the API.
      *
-     * @param string $path 请求路径
-     * @param array|null $head 请求头部
-     * @param array|null $param 请求参数
-     * @param string|null $body 请求 body
-     * @param string $version API 版本号
-     * @param string $method 请求方法
-     * @return string|bool 返回响应
-     * @throws Exception
+     * @param string $path Request path
+     * @param array|null $param Request parameters
+     * @param string|null $body Request body
+     * @param string $version API version
+     * @param string $method HTTP method (GET, POST, PUT, DELETE)
+     * @return array|string|bool Response from the API
+     * @throws Exception if the HTTP request fails
      */
-    public static function sendSdkRequest($path, $head, $param, $body, $version, $method = 'GET')
+    public function sendSdkRequest($path, $param, $body, $version, $method = 'GET')
     {
-        // 调试输出
-        // Log::info('HTTP Method: ' . $method);
+        $url = $this->buildUrl($path, $param);
+        $timestamp = $this->getTimestamp();
 
-        // 确保静态属性已经初始化
-        if (!isset(self::$baseUrl) || !isset(self::$timeUrl)) {
-            self::init();
+        $headers = $this->buildHeaders($param, $timestamp, $body, $version);
+
+        $response = $this->makeHttpRequest($url, $headers, $body, $method);
+
+        if ($response->failed()) {
+            throw new Exception('HTTP Request Failed: ' . $response->body());
         }
 
-        // 构建请求地址
-        $url = self::$baseUrl . $path;
+        return json_decode($response->body(), true);
+    }
+
+    /**
+     * Build the full URL with parameters.
+     *
+     * @param string $path
+     * @param array|null $param
+     * @return string
+     */
+    protected function buildUrl($path, $param)
+    {
+        $url = $this->baseUrl . $path;
         $urlParams = [];
 
         if (is_array($param)) {
@@ -58,85 +80,88 @@ class AepSdkService
         }
 
         if (count($urlParams) > 0) {
-            $url = $url . '?' . implode('&', $urlParams);
+            $url .= '?' . implode('&', $urlParams);
         }
 
-        // 获取当前时间戳和偏移量
-        $currentTime = self::getMillisecond();
-        if ($currentTime - self::$lastGetOffsetTime > 300 * 1000) {
-            self::$offset = self::getTimeOffset();
-            self::$lastGetOffsetTime = $currentTime;
+        return $url;
+    }
+
+    /**
+     * Get the current timestamp with offset.
+     *
+     * @return float
+     */
+    protected function getTimestamp()
+    {
+        $currentTime = $this->getMillisecond();
+        if ($currentTime - $this->lastGetOffsetTime > 300 * 1000) {
+            $this->offset = $this->getTimeOffset();
+            $this->lastGetOffsetTime = $currentTime;
         }
 
-        $timestamp = self::getMillisecond() + self::$offset;
+        return $this->getMillisecond() + $this->offset;
+    }
 
-        // 创建请求头，包含 app_key 和其他必要信息
-        $headers = [
-            'application' => self::$appKey,
+    /**
+     * Build headers for the HTTP request.
+     *
+     * @param array|null $param
+     * @param string $timestamp
+     * @param string|null $body
+     * @param string $version
+     * @return array
+     */
+    protected function buildHeaders($param, $timestamp, $body, $version)
+    {
+        return [
+            'application' => $this->appKey,
             'timestamp'   => (string) $timestamp,
             'version'     => $version,
-            'signature'   => self::sign(array_merge($param ?? [], $head ?? []), $timestamp, $body),
-            'MasterKey'   => $head['MasterKey'] ?? '',
+            'signature'   => $this->sign($param ?? [], $timestamp, $body),
+            'MasterKey'   => $this->masterKey,
             'Content-Type' => 'application/json'
         ];
+    }
 
-        if ($head != null) {
-            $headers = array_merge($headers, $head);
-        }
-
-        // 使用 switch-case 来确保 HTTP 请求方法是合法的
+    /**
+     * Make the HTTP request based on the method.
+     *
+     * @param string $url
+     * @param array $headers
+     * @param string|null $body
+     * @param string $method
+     * @return \Illuminate\Http\Client\Response
+     * @throws Exception
+     */
+    protected function makeHttpRequest($url, $headers, $body, $method)
+    {
         switch (strtolower($method)) {
             case 'get':
-                $response = Http::withHeaders($headers)
-                    ->timeout(80)
-                    ->connectTimeout(60)
-                    ->get($url);
-                break;
+                return Http::withHeaders($headers)->timeout(80)->connectTimeout(60)->get($url);
             case 'post':
-                $response = Http::withHeaders($headers)
-                    ->timeout(80)
-                    ->connectTimeout(60)
-                    ->post($url, $body);
-                break;
+                return Http::withHeaders($headers)->timeout(80)->connectTimeout(60)->post($url, $body);
             case 'put':
-                $response = Http::withHeaders($headers)
-                    ->timeout(80)
-                    ->connectTimeout(60)
-                    ->put($url, $body);
-                break;
+                return Http::withHeaders($headers)->timeout(80)->connectTimeout(60)->put($url, $body);
             case 'delete':
-                $response = Http::withHeaders($headers)
-                    ->timeout(80)
-                    ->connectTimeout(60)
-                    ->delete($url, $body);
-                break;
+                return Http::withHeaders($headers)->timeout(80)->connectTimeout(60)->delete($url, $body);
             default:
                 throw new Exception("Invalid HTTP method: $method");
         }
-
-        if ($response->failed()) {
-            // Log::error('HTTP Request Failed: ' . $response->body());
-            throw new Exception('HTTP Request Failed: ' . $response->body());
-        }
-
-        return json_decode($response->body(), true);
     }
 
-
-
     /**
-     * 获取时间偏移量
+     * Get the time offset from the server.
      *
      * @return int
      */
-    protected static function getTimeOffset()
+    protected function getTimeOffset()
     {
         $offsetTime = 0;
 
         try {
-            $start = self::getMillisecond();
-            $response = Http::get(self::$timeUrl);
-            $end = self::getMillisecond();
+            $start = $this->getMillisecond();
+            $response = Http::get($this->timeUrl);
+            $end = $this->getMillisecond();
 
             if ($response->successful() && $response->header('x-ag-timestamp')) {
                 $offsetTime = round($response->header('x-ag-timestamp') - ($start + $end) / 2);
@@ -144,52 +169,49 @@ class AepSdkService
                 throw new Exception("Error: cannot get timestamp.");
             }
         } catch (Exception $e) {
-            // Log::error($e->getMessage());
+            Log::error($e->getMessage());
         }
 
         return $offsetTime;
     }
 
     /**
-     * 获取当前时间戳（毫秒）
+     * Get the current timestamp in milliseconds.
      *
      * @return float
      */
-    protected static function getMillisecond()
+    protected function getMillisecond()
     {
         return round(microtime(true) * 1000);
     }
 
     /**
-     * 计算签名
+     * Calculate the signature for the request.
      *
-     * @param array $param 请求参数
-     * @param string $timestamp 时间戳
-     * @param string|null $body 请求body
-     * @return string 签名数据
+     * @param array $param
+     * @param string $timestamp
+     * @param string|null $body
+     * @return string
      */
-    protected static function sign($param, $timestamp, $body = null)
+    protected function sign($param, $timestamp, $body = null)
     {
         ksort($param);
 
-        // 将 application 和 timestamp 合并进请求参数中
         $temp = array_merge([
-            'application' => self::$appKey,  // appKey 应该作为 application
+            'application' => $this->appKey,
             'timestamp'   => $timestamp
         ], $param);
 
         $s = '';
         foreach ($temp as $key => $value) {
-            $s .= $key . ':' . $value . "\n";  // 确保每个键值对以 'key:value' 格式拼接
+            $s .= $key . ':' . $value . "\n";
         }
 
-        // 检查是否应该包含 body，并确保格式一致
         if ($body) {
-            $s .= json_encode($body, JSON_UNESCAPED_UNICODE) . "\n";  // 确保 body 使用正确的 JSON 格式
+            $s .= json_encode($body, JSON_UNESCAPED_UNICODE) . "\n";
         }
 
-        // 生成 HMAC-SHA1 签名
-        $hashHmac = hash_hmac('sha1', $s, self::$appSecret, true);  // 使用 appSecret 作为密钥
-        return base64_encode($hashHmac);  // base64 编码签名
+        $hashHmac = hash_hmac('sha1', $s, $this->appSecret, true);
+        return base64_encode($hashHmac);
     }
 }

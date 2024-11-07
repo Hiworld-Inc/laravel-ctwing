@@ -6,40 +6,39 @@ use Hiworld\CTWing\Services\AepSdkService;
 
 class DeviceCommand
 {
-    protected $masterKey;
-
-    public function __construct($masterKey = null)
-    {
-        // 从配置文件中获取默认值，若未传入参数则使用配置值
-        $this->masterKey = $masterKey ?? config('ctwing.master_key');
-    }
-
-    //参数MasterKey: 类型String, 参数不可以为空
-    //  描述:MasterKey在该设备所属产品的概况中可以查看
-    //参数body: 类型json, 参数不可以为空
-    //  描述:body,具体参考平台api说明
+    /**
+     * Create a device command.
+     *
+     * @param array|string $body JSON body, cannot be null. Refer to platform API documentation for details.
+     * @return mixed
+     */
     public function CreateCommand($body)
     {
         $path = "/aep_device_command/command";
-        $headers = ["MasterKey" => $this->masterKey];
-
         $version = "20190712225145";
 
-        return AepSdkService::sendSdkRequest($path, $headers, null, $body, $version, 'POST');
+        if (empty($body)) {
+            throw new \InvalidArgumentException("Body cannot be empty");
+        }
+
+        return AepSdkService::sendSdkRequest($path, null, $body, $version, 'POST');
     }
 
-    //参数MasterKey: 类型String, 参数不可以为空
-    //  描述:MasterKey在该设备所属产品的概况中可以查看
-    //参数commandId: 类型String, 参数不可以为空
-    //  描述:创建指令成功响应中返回的id，
-    //参数productId: 类型long, 参数不可以为空
-    //  描述:
-    //参数deviceId: 类型String, 参数不可以为空
-    //  描述:设备ID
+    /**
+     * Query a device command.
+     *
+     * @param string $commandId Command ID, cannot be null.
+     * @param string $productId Product ID, cannot be null.
+     * @param string $deviceId Device ID, cannot be null.
+     * @return mixed
+     */
     public function QueryCommand($commandId, $productId, $deviceId)
     {
         $path = "/aep_device_command/command";
-        $headers = ["MasterKey" => $this->masterKey];
+
+        if (empty($commandId) || empty($productId) || empty($deviceId)) {
+            throw new \InvalidArgumentException("Command ID, Product ID, and Device ID cannot be empty");
+        }
 
         $param = [
             "commandId" => $commandId,
@@ -49,24 +48,28 @@ class DeviceCommand
 
         $version = "20190712225241";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, null, $version, "GET");
+        return AepSdkService::sendSdkRequest($path, $param, null, $version, "GET");
     }
 
-    //参数MasterKey: 类型String, 参数不可以为空
-    //  描述:
-    //参数body: 类型json, 参数不可以为空
-    //  描述:body,具体参考平台api说明
+    /**
+     * Cancel a device command.
+     *
+     * @param array|string $body JSON body, cannot be null. Refer to platform API documentation for details.
+     * @return mixed
+     */
     public function CancelCommand($body)
     {
         $path = "/aep_device_command/cancelCommand";
-        $headers = ["MasterKey" => $this->masterKey];
-
         $version = "20190615023142";
+
+        if (empty($body)) {
+            throw new \InvalidArgumentException("Body cannot be empty");
+        }
 
         if (is_array($body)) {
             $body = json_encode($body);
         }
 
-        return AepSdkService::sendSdkRequest($path, $headers, null, $body, $version, "PUT");
+        return AepSdkService::sendSdkRequest($path, null, $body, $version, "PUT");
     }
 }

@@ -21,11 +21,10 @@ class DeviceCommandCancel
     public function CancelAllCommand($body)
     {
         $path="/aep_device_command_cancel/cancelAllCommand";
-        $headers = ["MasterKey" => $this->masterKey];
 
         $param=null;
         $version ="20230419143717";
 
-        return AepSdkService::sendSdkRequest($path, $headers, $param, $body, $version, "PUT");
+        return AepSdkService::sendSdkRequest($path, $param, $body, $version, "PUT");
     }
 }
