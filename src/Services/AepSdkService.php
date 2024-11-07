@@ -9,23 +9,20 @@ use Exception;
 class AepSdkService
 {
     // 声明静态属性
-    protected static $baseUrl;
-    protected static $timeUrl;
-    protected static $appKey;
-    protected static $appSecret;
+    protected $baseUrl;
+    protected $timeUrl;
+    protected $appKey;
+    protected $appSecret;
     protected static $offset = 0;
     protected static $lastGetOffsetTime = 0;
 
-    /**
-     * 初始化静态属性
-     */
-    public static function init()
+    public function __construct()
     {
-        // 从配置中获取 baseUrl 和 timeUrl
-        self::$baseUrl = config('ctwing.base_url');
-        self::$timeUrl = config('ctwing.time_url');
-        self::$appKey = config('ctwing.app_key');
-        self::$appSecret = config('ctwing.app_secret');
+        $config = config('ctwing');
+        $this->baseUrl = $config['base_url'];
+        $this->timeUrl = $config['time_url'];
+        $this->appKey = $config['app_key'];
+        $this->appSecret = $config['app_secret'];
     }
 
     /**
